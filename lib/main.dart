@@ -1,8 +1,44 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
 import 'package:storage_helper/storage_helper.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+// sensitive data should not be stored this way
+class Data {
+  String? name;
+  String? email;
+  Data({
+    this.name,
+    this.email,
+  });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'name': name,
+      'email': email,
+    };
+  }
+
+  factory Data.fromMap(Map<String, dynamic> map) {
+    return Data(
+      name: map['name'] != null ? map['name'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Data.fromJson(String source) =>
+      Data.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() => 'Data(name: $name, email: $email)';
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController controller = TextEditingController();
   TextEditingController controller2 = TextEditingController();
 
+  Data g = Data();
+
   @override
   void initState() {
     getLocalData();
@@ -47,15 +85,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getLocalData() async {
-    Map y = await widget.storageHelper.readLocalJsonFile("data.json");
-    if (y.containsKey("name") && y.containsKey("email")) {
-      controller.text = y['name'] ?? '';
-      controller2.text = y['email'] ?? '';
-    } else {
-      // write these keys and default values to the file
-      widget.storageHelper
-          .writeToLocalJsonFile("data.json", {"name": null, "email": null});
-    }
+    Map<String, dynamic> y =
+        await widget.storageHelper.readLocalJsonFile("data.json");
+    g = Data.fromMap(y);
+    controller.text = g.name ?? '';
+    controller2.text = g.email ?? '';
   }
 
   @override
@@ -76,12 +110,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Text("Names"),
                   TextFormField(
                     controller: controller,
+                    onChanged: (s) {
+                      g.name = s;
+                    },
                   ),
                 ]),
                 TableRow(children: [
                   const Text("Email"),
                   TextFormField(
                     controller: controller2,
+                    onChanged: (s) {
+                      g.email = s;
+                    },
                   ),
                 ])
               ],
@@ -95,10 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   widget.storageHelper.writeToLocalJsonFile(
                     "data.json",
-                    {
-                      "name": controller.text,
-                      "email": controller2.text,
-                    },
+                    g.toMap(),
                   );
                 },
                 child: const Text("Save"),

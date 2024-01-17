@@ -20,10 +20,10 @@ class StorageHelper {
     return f;
   }
 
-  Future<Map> readLocalJsonFile(String fileName) async {
+  Future<Map<String, dynamic>> readLocalJsonFile(String fileName) async {
     try {
       final file = await getLocalJsonFile(fileName);
-      Map y = jsonDecode(await file.readAsString());
+      Map<String, dynamic> y = jsonDecode(await file.readAsString());
       return y;
     } catch (e) {
       debugPrint("$e");
