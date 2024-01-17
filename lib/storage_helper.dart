@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 class StorageHelper {
@@ -15,7 +16,7 @@ class StorageHelper {
     if (await File('$path/$fileName').exists()) return File('$path/$fileName');
 
     File f = await File('$path/$fileName').create();
-    f.writeAsString("{}");
+    f.writeAsString(jsonEncode({}));
     return f;
   }
 
@@ -25,6 +26,7 @@ class StorageHelper {
       Map y = jsonDecode(await file.readAsString());
       return y;
     } catch (e) {
+      debugPrint("$e");
       return {};
     }
   }

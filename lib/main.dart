@@ -50,12 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
     Map y = await widget.storageHelper.readLocalJsonFile("data.json");
     // print(y); // {name: Lemi, email: mileslemi@gmail.com}
     if (y.containsKey("name") && y.containsKey("email")) {
-      controller.text = y['name'];
-      controller2.text = y['email'];
+      controller.text = y['name'] ?? '';
+      controller2.text = y['email'] ?? '';
     } else {
       // write these keys and default values to the file
-      widget.storageHelper.writeToLocalJsonFile(
-          "data.json", {"name": "Lemi", "email": "mileslemi@gmail.com"});
+      widget.storageHelper
+          .writeToLocalJsonFile("data.json", {"name": null, "email": null});
     }
   }
 
@@ -93,7 +93,15 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               width: 200,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.storageHelper.writeToLocalJsonFile(
+                    "data.json",
+                    {
+                      "name": controller.text,
+                      "email": controller2.text,
+                    },
+                  );
+                },
                 child: const Text("Save"),
               ),
             )
