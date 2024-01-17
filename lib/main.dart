@@ -48,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getLocalData() async {
     Map y = await widget.storageHelper.readLocalJsonFile("data.json");
-    // print(y); // {name: Lemi, email: mileslemi@gmail.com}
     if (y.containsKey("name") && y.containsKey("email")) {
       controller.text = y['name'] ?? '';
       controller2.text = y['email'] ?? '';
