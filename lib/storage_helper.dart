@@ -1,17 +1,38 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
 class StorageHelper {
   static Future<String> get _localPath async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getApplicationSupportDirectory();
     return dir.path;
   }
 
-  static Future<File> getLocalFile(String fileName) async {
+  Future<File> getLocalJsonFile(String fileName) async {
     final path = await _localPath;
 
     if (await File('$path/$fileName').exists()) return File('$path/$fileName');
-    return File('$path/$fileName').create();
+
+    File f = await File('$path/$fileName').create();
+    f.writeAsString("{}");
+    return f;
+  }
+
+  Future<Map> readLocalJsonFile(String fileName) async {
+    try {
+      final file = await getLocalJsonFile(fileName);
+      Map y = jsonDecode(await file.readAsString());
+      return y;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  Future<File> writeToLocalJsonFile(String fileName, Map dataToSave) async {
+    final file = await getLocalJsonFile(fileName);
+
+    file.writeAsString(json.encode(dataToSave));
+    return file;
   }
 }
